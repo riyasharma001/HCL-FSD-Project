@@ -1,0 +1,19 @@
+stateDiagram-v2
+  [*] --> DRAFT
+  DRAFT --> PENDING_APPROVAL : submit
+  PENDING_APPROVAL --> APPROVED : approve
+  PENDING_APPROVAL --> DRAFT : reject ⚠ no REJECTED status exists
+  APPROVED --> SENT : mark sent (AR)
+  SENT --> PARTIALLY_PAID : partial payment
+  SENT --> PAID : full payment
+  PARTIALLY_PAID --> PAID : outstanding = 0
+  SENT --> OVERDUE : past due date
+  PARTIALLY_PAID --> OVERDUE : past due date
+  OVERDUE --> PARTIALLY_PAID : partial payment
+  OVERDUE --> PAID : full payment
+  PAID --> PARTIALLY_PAID : payment reversed ⚠
+  DRAFT --> CANCELLED
+  PENDING_APPROVAL --> CANCELLED
+  APPROVED --> CANCELLED
+  PAID --> [*]
+  CANCELLED --> [*]

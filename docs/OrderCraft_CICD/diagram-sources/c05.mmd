@@ -1,0 +1,10 @@
+flowchart TD
+  A["Developer adds new migration V4__something.sql"] --> B["PR: CI starts Oracle service container"]
+  B --> C["App starts, Flyway migrates fresh schema V1 to V4"]
+  C --> D{"Hibernate ddl-auto validate matches entities?"}
+  D -->|"No"| X["CI fails: fix entity or migration"]
+  D -->|"Yes"| E["Merge to main"]
+  E --> F["Staging deploy: Flyway applies V4 on startup"]
+  F --> G{"Healthy?"}
+  G -->|"No"| H["Rollback app image only, fix forward with V5"]
+  G -->|"Yes"| I["Production approval then deploy: Flyway applies V4"]

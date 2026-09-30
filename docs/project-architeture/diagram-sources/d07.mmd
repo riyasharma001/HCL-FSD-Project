@@ -1,0 +1,14 @@
+stateDiagram-v2
+  [*] --> DRAFT
+  DRAFT --> PENDING_APPROVAL : submit
+  PENDING_APPROVAL --> APPROVED : approve, triggers BOM explosion
+  PENDING_APPROVAL --> REJECTED : reject with comment
+  REJECTED --> DRAFT : revise ⚠
+  APPROVED --> IN_PROGRESS : start manufacturing
+  IN_PROGRESS --> COMPLETED : all items ready
+  DRAFT --> CANCELLED : cancel with reason
+  PENDING_APPROVAL --> CANCELLED : cancel
+  APPROVED --> CANCELLED : cancel, reverse reservations
+  IN_PROGRESS --> CANCELLED : cancel ⚠
+  COMPLETED --> [*]
+  CANCELLED --> [*]

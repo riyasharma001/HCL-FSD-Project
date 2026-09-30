@@ -1,0 +1,18 @@
+flowchart TD
+  A(["Developer pushes feature branch"]) --> B["Open pull request to main"]
+  B --> C["CI runs in parallel:<br/>backend build and unit tests<br/>Flyway + Oracle smoke test<br/>security scans<br/>docker build and image scan<br/>frontend build, when present"]
+  C --> D{"All checks green and review approved?"}
+  D -->|"No"| X1(["Fix and push again"])
+  D -->|"Yes"| E["Merge to main"]
+  E --> F["CI re-runs on main"]
+  F --> G{"CI passed?"}
+  G -->|"No"| X2(["Fix forward, no deploy"])
+  G -->|"Yes"| H["CD: build and push image to GHCR, tag sha-abc1234"]
+  H --> I["Deploy to staging via deploy.sh"]
+  I --> J{"Health check passed?"}
+  J -->|"No"| K(["Auto rollback to previous tag, pipeline fails"])
+  J -->|"Yes"| L["Wait for production approval"]
+  L --> M["Deploy same image to production via deploy.sh"]
+  M --> N{"Health check passed?"}
+  N -->|"No"| K
+  N -->|"Yes"| O(["Release live"])

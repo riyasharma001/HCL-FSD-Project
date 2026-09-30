@@ -1,0 +1,27 @@
+flowchart TD
+  A(["Customer order"]) --> B["Create Sales Order (DRAFT)"]
+  B --> C["Submit for approval"]
+  C --> D{"Approval workflow"}
+  D -->|"Rejected"| B
+  D -->|"Approved"| E["BOM explosion: qty x BOM lines"]
+  E --> F["Compare with inventory"]
+  F --> G{"Shortfall?"}
+  G -->|"No"| K
+  G -->|"Yes"| H["Auto-generate POs grouped by vendor"]
+  H --> I{"PO approval"}
+  I -->|"Rejected"| H
+  I -->|"Approved"| J["PO ORDERED to vendor"]
+  J --> J2["Goods receipt (partial or full)"]
+  J2 --> J3["Inventory updated"]
+  J3 --> K["SO IN_PROGRESS (manufacturing is external)"]
+  K --> L["SO COMPLETED"]
+  L --> M["Generate AR invoice"]
+  M --> N{"Invoice approval"}
+  N -->|"Approved"| O["Mark SENT"]
+  O --> P["Customer payment recorded"]
+  P --> Q{"Outstanding = 0?"}
+  Q -->|"No"| R["PARTIALLY_PAID"] --> P
+  Q -->|"Yes"| S["PAID"]
+  J2 -.-> V["Vendor (AP) invoice recorded"]
+  V -.-> W["Vendor payment (OUTGOING)"]
+  S --> Z(["Revenue on dashboard"])

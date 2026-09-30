@@ -1,0 +1,26 @@
+erDiagram
+  oc_users ||--o{ oc_user_roles : has
+  oc_roles ||--o{ oc_user_roles : assigned
+  oc_roles ||--o{ oc_role_permissions : grants
+  oc_permissions ||--o{ oc_role_permissions : in
+  oc_users {
+    number id PK
+    string username UK
+    string email UK
+    string password_hash
+    number is_active
+  }
+  oc_roles {
+    number id PK
+    string role_name UK
+    number is_system
+  }
+  oc_permissions {
+    number id PK
+    string permission_key UK
+  }
+  oc_token_blacklist {
+    number id PK
+    string token_hash
+    timestamp expiry_date
+  }

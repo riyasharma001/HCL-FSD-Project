@@ -1,0 +1,18 @@
+sequenceDiagram
+  actor U as User
+  participant FE as Angular
+  participant JF as JwtAuthenticationFilter
+  participant AS as AuthService
+  participant DB as Oracle
+  U->>FE: username + password
+  FE->>AS: POST /api/auth/login
+  AS->>DB: load user + roles + permissions
+  AS-->>FE: JWT + user profile (roles, permissions)
+  FE->>JF: request with Bearer token
+  JF->>DB: is token hash in oc_token_blacklist?
+  JF-->>FE: 401 if invalid or blacklisted, 403 if permission missing
+  FE->>AS: POST /api/auth/refresh (old token)
+  AS->>DB: blacklist old token
+  AS-->>FE: new JWT
+  FE->>AS: POST /api/auth/logout
+  AS->>DB: blacklist token

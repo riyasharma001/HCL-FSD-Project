@@ -1,0 +1,9 @@
+stateDiagram-v2
+  [*] --> PENDING : submit, evaluate workflow by type and amount
+  PENDING --> PENDING : approve, advance to next step
+  PENDING --> APPROVED : approve at last step
+  PENDING --> REJECTED : reject (comment mandatory)
+  PENDING --> OVERRIDDEN : admin force-approve
+  APPROVED --> [*]
+  REJECTED --> [*]
+  OVERRIDDEN --> [*]
