@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OrderCraft - Manufacturing OMS</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#eef2f6; margin:0; }
+    header { background:#1b4332; color:#fff; padding:16px 24px; font-size:22px; }
+    nav { background:#2d6a4f; padding:8px 24px; }
+    nav button { background:transparent; color:#fff; border:1px solid #95d5b2; margin-right:6px; }
+    .wrap { max-width:1100px; margin:16px auto; padding:0 12px; }
+    .card { background:#fff; border-radius:8px; padding:14px; margin-bottom:14px;
+            box-shadow:0 1px 4px rgba(0,0,0,.15); overflow-x:auto; }
+    h3 { margin:0 0 8px; color:#1b4332; }
+    input, select { padding:7px; margin:3px 4px 3px 0; border:1px solid #bbb; border-radius:4px; }
+    button { padding:6px 12px; background:#2d6a4f; color:#fff; border:0; border-radius:4px;
+             cursor:pointer; margin:2px; }
+    button:hover { background:#1b4332; }
+    table { width:100%; border-collapse:collapse; margin-top:8px; }
+    th, td { border-bottom:1px solid #ddd; padding:6px; text-align:left; font-size:13px; }
+    th { background:#d8f3dc; }
+    #msg { padding:10px; border-radius:4px; display:none; margin-bottom:10px; }
+    .ok { background:#d4edda; color:#155724; }
+    .err { background:#f8d7da; color:#721c24; }
+    .master-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.master-tab {
+    display: none;
+}
+
+.master-tab.active {
+    display: block;
+}
+  </style>
+</head>
+<body>
+<header>🏭 OrderCraft – Manufacturing Order Management System</header>
+<nav>
+  <button onclick="tab('masters')">Master Data</button>
+  <button onclick="tab('orders')">Orders</button>
+  <button onclick="tab('pos')">Purchase Orders</button>
+  <button onclick="tab('invoices')">Invoices &amp; Payments</button>
+</nav>
+
+<div class="wrap">
+  <div id="msg"></div>
+
+  <!-- MASTER DATA -->
+  <section id="masters">
+  <div class="master-tabs">
+    <button onclick="showMasterTab('customers')">Customers</button>
+    <button onclick="showMasterTab('products')">Products</button>
+    <button onclick="showMasterTab('materials')">Raw Materials</button>
+    <button onclick="showMasterTab('bom')">Bill of Materials</button>
+</div>
+   <div id="customers" class="master-tab active">
+    <div class="card">
+      <h3>Customers</h3>
+      <input id="cName" placeholder="Name"><input id="cEmail" placeholder="Email">
+      <input id="cPhone" placeholder="Phone"><input id="cAddr" placeholder="Address">
+      <button onclick="addCustomer()">Add</button>
+      <table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Address</th></tr></thead>
+        <tbody id="custBody"></tbody></table>
+    </div>
+    </div>
+    <div id="products" class="master-tab">
+    <div class="card">
+      <h3>Products (finished goods)</h3>
+      <input id="pCode" placeholder="Code"><input id="pName" placeholder="Name">
+      <input id="pPrice" type="number" placeholder="Price">
+      <button onclick="addProduct()">Add</button>
+      <table><thead><tr><th>Code</th><th>Name</th><th>Price</th></tr></thead>
+        <tbody id="prodBody"></tbody></table>
+    </div>
+    </div>
+
+    <div id="materials" class="master-tab">
+    <div class="card">
+      <h3>Raw Materials</h3>
+      <input id="mCode" placeholder="Code"><input id="mName" placeholder="Name">
+      <input id="mCost" type="number" placeholder="Unit cost"><input id="mStock" type="number" placeholder="Stock">
+      <input id="mSupp" placeholder="Supplier">
+      <button onclick="addMaterial()">Add</button>
+      <table><thead><tr><th>Code</th><th>Name</th><th>Unit Cost</th><th>Stock</th><th>Supplier</th></tr></thead>
+        <tbody id="matBody"></tbody></table>
+    </div>
+    </div>
+
+    <div id="bom" class="master-tab">
+    <div class="card">
+      <h3>Bill of Materials (materials needed for 1 unit of a product)</h3>
+      <select id="bomProduct"></select><select id="bomMaterial"></select>
+      <input id="bomQty" type="number" placeholder="Qty per unit">
+      <button onclick="addBom()">Add</button>
+      <table><thead><tr><th>Product</th><th>Material</th><th>Qty / unit</th></tr></thead>
+        <tbody id="bomBody"></tbody></table>
+    </div>
+    </div>
+  </section>
+
+  <!-- ORDERS -->
+  <section id="orders" style="display:none">
+    <div class="card">
+      <h3>New Order</h3>
+      <select id="oCustomer"></select><select id="oProduct"></select>
+      <input id="oQty" type="number" placeholder="Quantity">
+      <button onclick="addItem()">Add Item</button>
+      <ul id="cart"></ul>
+      <button onclick="placeOrder()">Place Order</button>
+    </div>
+    <div class="card">
+      <h3>Orders</h3>
+      <table><thead><tr><th>Order No</th><th>Customer</th><th>Date</th><th>Status</th><th>Total</th><th>Actions</th></tr></thead>
+        <tbody id="ordBody"></tbody></table>
+    </div>
+    <div class="card" id="detail"><h3>Details</h3><p>Click BOM or Items on an order.</p></div>
+  </section>
+
+  <!-- PURCHASE ORDERS -->
+  <section id="pos" style="display:none">
+    <div class="card">
+      <h3>Purchase Orders</h3>
+      <table><thead><tr><th>PO No</th><th>Material</th><th>Qty</th><th>Total</th><th>For Order</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+        <tbody id="poBody"></tbody></table>
+    </div>
+  </section>
+
+  <!-- INVOICES -->
+  <section id="invoices" style="display:none">
+    <div class="card">
+      <h3>Invoices</h3>
+      <table><thead><tr><th>Invoice</th><th>Order</th><th>Subtotal</th><th>GST 18%</th><th>Total</th><th>Paid</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="invBody"></tbody></table>
+    </div>
+    <div class="card" id="payBox"><h3>Payments</h3><p>Click Payments on an invoice.</p></div>
+  </section>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
