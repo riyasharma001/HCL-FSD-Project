@@ -1,0 +1,16 @@
+flowchart TB
+  subgraph FE["Angular 17+ SPA"]
+    R["Routes + Guards"] --> C["Feature components"]
+    C --> S["Services"]
+    S --> I["HTTP interceptor (adds Bearer JWT)"]
+  end
+  I -->|"REST / JSON"| F
+  subgraph BE["Spring Boot 3.3 / Java 17"]
+    F["JwtAuthenticationFilter + SecurityConfig"] --> CT["Controllers"]
+    CT --> SV["Services (business logic)"]
+    SV --> AE["Approval engine"]
+    SV --> RP["Spring Data JPA repositories"]
+    CT -.-> EX["GlobalExceptionHandler"]
+  end
+  RP -->|"JDBC"| DB[("Oracle 21c XE")]
+  FW["Flyway migrations"] --> DB

@@ -1,0 +1,16 @@
+stateDiagram-v2
+  [*] --> Built : CI passed on main
+  Built --> Published : image pushed to GHCR
+  Published --> StagingDeploying : deploy-staging starts
+  StagingDeploying --> StagingLive : health check OK
+  StagingDeploying --> StagingRolledBack : health check failed
+  StagingRolledBack --> [*]
+  StagingLive --> AwaitingApproval : production job queued
+  AwaitingApproval --> ProductionDeploying : reviewer approves
+  AwaitingApproval --> Rejected : reviewer rejects or timeout
+  ProductionDeploying --> Live : health check OK
+  ProductionDeploying --> ProductionRolledBack : health check failed
+  Live --> Superseded : newer release goes live
+  ProductionRolledBack --> [*]
+  Rejected --> [*]
+  Superseded --> [*]

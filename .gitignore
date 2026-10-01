@@ -1,0 +1,19 @@
+# Java & Maven
+target/
+*.class
+*.jar
+*.war
+.settings/
+.project
+.classpath
+
+# Frontend / Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.vscode/
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,123 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Procurement & Purchase Orders</h1>
+      <p class="page-subtitle">Track raw material replenishments, incoming vendor deliveries, and stock updates</p>
+    </div>
+    <button mat-stroked-button (click)="loadPOs()" [disabled]="loading()">
+      <mat-icon>refresh</mat-icon> Refresh
+    </button>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" class="mb-4"></mat-progress-bar>
+  }
+
+  <!-- STATS CARDS -->
+  <div class="stats-grid">
+    <mat-card class="stat-card elevation-z1">
+      <div class="stat-icon bg-blue">
+        <mat-icon>local_shipping</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Total Purchase Orders</span>
+        <span class="stat-val">{{ totalOrders() }}</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card elevation-z1">
+      <div class="stat-icon bg-amber">
+        <mat-icon>pending_actions</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Pending Receipt</span>
+        <span class="stat-val text-amber">{{ pendingOrders() }}</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card elevation-z1">
+      <div class="stat-icon bg-emerald">
+        <mat-icon>inventory</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Completed Receipts</span>
+        <span class="stat-val text-emerald">{{ receivedOrders() }}</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card elevation-z1">
+      <div class="stat-icon bg-purple">
+        <mat-icon>payments</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Total Material Spend</span>
+        <span class="stat-val">₹{{ totalProcurementCost() | number:'1.2-2' }}</span>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- PURCHASE ORDERS TABLE -->
+  <mat-card class="table-card elevation-z1">
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>PO Number</th>
+            <th>Material Code & Name</th>
+            <th>Supplier</th>
+            <th>Quantity</th>
+            <th>Total Cost</th>
+            <th>Linked Order</th>
+            <th>Creation Date</th>
+            <th>Status</th>
+            <th>Receipt Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of purchaseOrders(); track p.id) {
+            <tr>
+              <td>
+                <span class="po-no">{{ p.poNo }}</span>
+              </td>
+              <td class="font-medium">
+                {{ p.material.name }}
+                <code class="code-tag">{{ p.material.code }}</code>
+              </td>
+              <td>{{ p.material.supplier || 'Vendor' }}</td>
+              <td><b>{{ p.quantity }}</b> units</td>
+              <td class="font-bold">₹{{ p.total | number:'1.2-2' }}</td>
+              <td>
+                @if (p.salesOrderId) {
+                  <span class="order-link">Order #{{ p.salesOrderId }}</span>
+                } @else {
+                  —
+                }
+              </td>
+              <td>{{ p.createdDate }}</td>
+              <td>
+                <span class="badge-status" [ngClass]="p.status === 'RECEIVED' ? 'badge-received' : 'badge-ordered'">
+                  {{ p.status }}
+                </span>
+              </td>
+              <td>
+                @if (p.status === 'ORDERED') {
+                  <button mat-flat-button color="primary" class="receive-btn" (click)="receivePo(p)">
+                    <mat-icon>move_to_inbox</mat-icon> Receive Stock
+                  </button>
+                } @else {
+                  <span class="received-text">
+                    <mat-icon class="check-icon">check</mat-icon> Stock In
+                  </span>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="9" class="empty-state">No purchase orders generated yet. Purchase orders are auto-suggested when orders have BOM shortages.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </mat-card>
+</div>

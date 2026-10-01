@@ -1,0 +1,273 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Sales Orders & Fulfillment</h1>
+      <p class="page-subtitle">Capture customer orders, trigger BOM explosion, review shortages, and advance fulfillment</p>
+    </div>
+    <button mat-stroked-button (click)="refreshOrders()" [disabled]="loading()">
+      <mat-icon>refresh</mat-icon> Refresh
+    </button>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" class="mb-4"></mat-progress-bar>
+  }
+
+  <!-- SECTION 1: CREATE NEW ORDER -->
+  <mat-card class="order-creator-card elevation-z1">
+    <mat-card-header>
+      <mat-icon mat-card-avatar color="primary">add_shopping_cart</mat-icon>
+      <mat-card-title>Create New Sales Order</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content class="pt-4">
+      <div class="creator-grid">
+        <!-- Customer Selection -->
+        <mat-form-field appearance="outline" class="customer-select">
+          <mat-label>Select Customer</mat-label>
+          <mat-select [(ngModel)]="selectedCustomerId" required>
+            @for (c of customers(); track c.id) {
+              <mat-option [value]="c.id">{{ c.name }} ({{ c.email || 'No email' }})</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Product Selection -->
+        <mat-form-field appearance="outline">
+          <mat-label>Select Finished Product</mat-label>
+          <mat-select [(ngModel)]="selectedProductId">
+            @for (p of products(); track p.id) {
+              <mat-option [value]="p.id">{{ p.code }} — {{ p.name }} (₹{{ p.price | number:'1.2-2' }})</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Quantity -->
+        <mat-form-field appearance="outline" class="qty-field">
+          <mat-label>Quantity</mat-label>
+          <input matInput type="number" min="1" [(ngModel)]="itemQuantity">
+        </mat-form-field>
+
+        <!-- Add Item to Cart Button -->
+        <div class="cart-btn-wrap">
+          <button mat-flat-button color="accent" (click)="addToCart()" class="add-item-btn">
+            <mat-icon>add</mat-icon> Add to Order
+          </button>
+        </div>
+      </div>
+
+      <!-- Cart Item Review -->
+      @if (cart().length > 0) {
+        <div class="cart-table-wrapper">
+          <table class="cart-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Unit Price</th>
+                <th>Quantity</th>
+                <th>Line Total</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of cart(); track item.productId; let idx = $index) {
+                <tr>
+                  <td class="font-medium">{{ item.productName }}</td>
+                  <td>₹{{ item.unitPrice | number:'1.2-2' }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td class="font-bold">₹{{ item.lineTotal | number:'1.2-2' }}</td>
+                  <td>
+                    <button mat-icon-button color="warn" (click)="removeFromCart(idx)" matTooltip="Remove">
+                      <mat-icon>delete_outline</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          <div class="cart-footer">
+            <div class="grand-total">
+              <span>Estimated Subtotal: </span>
+              <b>₹{{ cartTotal() | number:'1.2-2' }}</b>
+            </div>
+            <button mat-flat-button color="primary" class="place-order-btn" (click)="placeOrder()" [disabled]="loading()">
+              <mat-icon>check_circle</mat-icon> Submit Sales Order
+            </button>
+          </div>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <!-- SECTION 2: ORDERS LIST -->
+  <mat-card class="orders-table-card elevation-z1">
+    <mat-card-header>
+      <mat-icon mat-card-avatar color="primary">receipt_long</mat-icon>
+      <mat-card-title>All Sales Orders ({{ orders().length }})</mat-card-title>
+    </mat-card-header>
+
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Order No</th>
+            <th>Customer</th>
+            <th>Order Date</th>
+            <th>Status</th>
+            <th>Total Amount</th>
+            <th>Order Analysis</th>
+            <th>Workflow Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (o of orders(); track o.id) {
+            <tr [class.highlighted-row]="activeOrderId() === o.id">
+              <td>
+                <span class="order-no">{{ o.orderNo }}</span>
+              </td>
+              <td class="font-medium">{{ o.customer.name }}</td>
+              <td>{{ o.orderDate }}</td>
+              <td>
+                <span class="badge-status" [ngClass]="'badge-' + o.status.toLowerCase()">
+                  {{ o.status }}
+                </span>
+              </td>
+              <td class="font-bold">₹{{ o.total | number:'1.2-2' }}</td>
+              <td>
+                <div class="btn-group">
+                  <button mat-stroked-button class="action-btn" (click)="showOrderItems(o)">
+                    <mat-icon>list</mat-icon> Items
+                  </button>
+                  <button mat-stroked-button class="action-btn" (click)="showOrderBom(o)">
+                    <mat-icon>account_tree</mat-icon> BOM
+                  </button>
+                </div>
+              </td>
+              <td>
+                <div class="btn-group">
+                  @if (o.status === 'NEW') {
+                    <button mat-flat-button color="accent" class="action-btn" (click)="createPurchaseOrders(o.id)" matTooltip="Generate POs for any raw material shortage">
+                      <mat-icon>shopping_bag</mat-icon> Create POs
+                    </button>
+                    <button mat-flat-button color="primary" class="action-btn" (click)="confirmOrder(o.id)" matTooltip="Deduct materials from stock and confirm">
+                      <mat-icon>done</mat-icon> Confirm
+                    </button>
+                    <button mat-button color="warn" class="action-btn" (click)="cancelOrder(o.id)">
+                      <mat-icon>close</mat-icon> Cancel
+                    </button>
+                  }
+
+                  @if (o.status === 'CONFIRMED' || o.status === 'SHIPPED') {
+                    <button mat-flat-button color="primary" class="action-btn" (click)="advanceOrder(o.id)">
+                      <mat-icon>fast_forward</mat-icon>
+                      {{ o.status === 'CONFIRMED' ? 'Mark Shipped' : 'Mark Completed' }}
+                    </button>
+                  }
+
+                  @if (o.status === 'CONFIRMED' || o.status === 'SHIPPED' || o.status === 'COMPLETED') {
+                    <button mat-stroked-button class="action-btn text-primary" (click)="createInvoice(o.id)">
+                      <mat-icon>receipt</mat-icon> Invoice
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty-state">No sales orders found. Create your first order above!</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </mat-card>
+
+  <!-- SECTION 3: INSPECTION PANEL (ITEMS / BOM) -->
+  @if (activeDetailType()) {
+    <mat-card class="detail-drawer-card elevation-z2">
+      <div class="detail-header">
+        <div class="detail-title-wrap">
+          <mat-icon color="primary">{{ activeDetailType() === 'items' ? 'inventory_2' : 'account_tree' }}</mat-icon>
+          <h3>
+            {{ activeDetailType() === 'items' ? 'Ordered Items' : 'Bill of Materials & Inventory Shortage' }}
+            — Order #{{ activeOrder()?.orderNo }} ({{ activeOrder()?.customer?.name }})
+          </h3>
+        </div>
+        <button mat-icon-button (click)="closeDetails()"><mat-icon>close</mat-icon></button>
+      </div>
+
+      @if (detailLoading()) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      }
+
+      <!-- Order Items Detail View -->
+      @if (activeDetailType() === 'items' && !detailLoading()) {
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Item / Product</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of activeOrderItems(); track item.id) {
+              <tr>
+                <td class="font-medium">{{ item.product.name }} ({{ item.product.code }})</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.unitPrice | number:'1.2-2' }}</td>
+                <td class="font-bold">₹{{ (item.quantity * item.unitPrice) | number:'1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+      <!-- BOM & Shortage Detail View -->
+      @if (activeDetailType() === 'bom' && !detailLoading()) {
+        @if (activeOrderBom().length === 0) {
+          <p class="empty-detail">No BOM components defined for items in this order.</p>
+        } @else {
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Raw Material</th>
+                <th>Material Code</th>
+                <th>Required Quantity</th>
+                <th>Current Stock</th>
+                <th>Shortage</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of activeOrderBom(); track r.materialId) {
+                <tr [class.shortage-row]="r.shortage > 0">
+                  <td class="font-medium">{{ r.name }}</td>
+                  <td><code>{{ r.code }}</code></td>
+                  <td>{{ r.required }} units</td>
+                  <td>{{ r.inStock }} units</td>
+                  <td>
+                    @if (r.shortage > 0) {
+                      <span class="badge-status badge-cancelled">Short by {{ r.shortage }}</span>
+                    } @else {
+                      <span class="badge-status badge-completed">In Stock</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          @if (activeOrder()?.status === 'NEW') {
+            <div class="bom-actions">
+              <button mat-flat-button color="accent" (click)="createPurchaseOrders(activeOrderId()!)">
+                <mat-icon>shopping_bag</mat-icon> Auto-Create Purchase Orders for Shortage
+              </button>
+            </div>
+          }
+        }
+      }
+    </mat-card>
+  }
+</div>

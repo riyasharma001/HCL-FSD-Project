@@ -1,0 +1,59 @@
+<div class="app-shell">
+  @if (!isLoginPage()) {
+    <header class="app-header">
+      <div class="header-inner">
+        <!-- Brand -->
+        <a routerLink="/dashboard" class="brand-link">
+          <div class="brand-badge">
+            <mat-icon>precision_manufacturing</mat-icon>
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">OrderCraft</span>
+            <span class="brand-tag">Manufacturing OMS</span>
+          </div>
+        </a>
+
+        <!-- Main Nav Links -->
+        <nav class="nav-links">
+          <a routerLink="/dashboard" routerLinkActive="active-link" class="nav-item">
+            <mat-icon>dashboard</mat-icon>
+            <span>Dashboard</span>
+          </a>
+          <a routerLink="/masters" routerLinkActive="active-link" class="nav-item">
+            <mat-icon>category</mat-icon>
+            <span>Master Data</span>
+          </a>
+          <a routerLink="/orders" routerLinkActive="active-link" class="nav-item">
+            <mat-icon>shopping_cart</mat-icon>
+            <span>Orders</span>
+          </a>
+          <a routerLink="/procurement" routerLinkActive="active-link" class="nav-item">
+            <mat-icon>local_shipping</mat-icon>
+            <span>Procurement</span>
+          </a>
+          <a routerLink="/finance" routerLinkActive="active-link" class="nav-item">
+            <mat-icon>receipt_long</mat-icon>
+            <span>Finance &amp; Invoices</span>
+          </a>
+        </nav>
+
+        <!-- Right Side: User Menu & Logout -->
+        <div class="header-right">
+          <div class="user-pill">
+            <mat-icon class="user-icon">account_circle</mat-icon>
+            <span class="user-name">{{ auth.fullName() || auth.currentUser() || 'User' }}</span>
+            <span class="role-chip">{{ auth.role() || 'USER' }}</span>
+          </div>
+
+          <button mat-icon-button class="logout-btn" (click)="logout()" matTooltip="Sign Out">
+            <mat-icon>logout</mat-icon>
+          </button>
+        </div>
+      </div>
+    </header>
+  }
+
+  <main class="main-content" [class.no-header]="isLoginPage()">
+    <router-outlet></router-outlet>
+  </main>
+</div>

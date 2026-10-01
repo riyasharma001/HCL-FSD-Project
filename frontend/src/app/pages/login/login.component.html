@@ -1,0 +1,58 @@
+<div class="login-wrapper">
+  <div class="login-backdrop"></div>
+  <mat-card class="login-card elevation-z4">
+    <div class="brand-header">
+      <div class="brand-icon">
+        <mat-icon>precision_manufacturing</mat-icon>
+      </div>
+      <h2>OrderCraft</h2>
+      <p class="subtitle">Manufacturing Order Management System</p>
+    </div>
+
+    <mat-card-content>
+      <form (ngSubmit)="login()">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Username</mat-label>
+          <input matInput [(ngModel)]="username" name="username" required autocomplete="username">
+          <mat-icon matPrefix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword() ? 'password' : 'text'" [(ngModel)]="password" name="password" required autocomplete="current-password">
+          <mat-icon matPrefix>lock</mat-icon>
+          <button mat-icon-button matSuffix type="button" (click)="hidePassword.set(!hidePassword())" [attr.aria-label]="'Hide password'">
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <div class="demo-box">
+          <div class="demo-label">
+            <mat-icon>key</mat-icon>
+            <span>Quick Login with Demo Accounts:</span>
+          </div>
+          <div class="demo-buttons">
+            <button type="button" class="demo-pill" (click)="fillDemo('admin', 'admin123')">
+              Admin (admin123)
+            </button>
+            <button type="button" class="demo-pill" (click)="fillDemo('user', 'user123')">
+              Operator (user123)
+            </button>
+          </div>
+        </div>
+
+        <button mat-flat-button color="primary" class="login-btn w-full" type="submit" [disabled]="loading()">
+          @if (loading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+            <span>Signing in...</span>
+          } @else {
+            <ng-container>
+              <span>Sign In</span>
+              <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+            </ng-container>
+          }
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

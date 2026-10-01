@@ -1,0 +1,84 @@
+erDiagram
+  oc_customers ||--o{ oc_sales_orders : places
+  oc_sales_orders ||--|{ oc_sales_order_lines : contains
+  oc_items ||--o{ oc_sales_order_lines : sold_as
+  oc_items ||--o{ oc_boms : "finished good"
+  oc_boms ||--|{ oc_bom_lines : lists
+  oc_items ||--o{ oc_bom_lines : "raw material"
+  oc_vendors ||--o{ oc_purchase_orders : supplies
+  oc_sales_orders |o--o{ oc_purchase_orders : "triggers (optional)"
+  oc_purchase_orders ||--|{ oc_purchase_order_lines : contains
+  oc_items ||--o{ oc_purchase_order_lines : bought_as
+  oc_purchase_orders ||--o{ oc_goods_receipts : received_by
+  oc_goods_receipts ||--|{ oc_goods_receipt_lines : contains
+  oc_purchase_order_lines ||--o{ oc_goods_receipt_lines : fulfilled_by
+  oc_items ||--|| oc_inventory : "stock level"
+  oc_items ||--o{ oc_stock_movements : moves
+  oc_items {
+    number id PK
+    string item_code UK
+    string item_type "FINISHED_GOOD or RAW_MATERIAL"
+    string uom
+    number selling_price
+    number standard_cost
+    number reorder_level
+  }
+  oc_boms {
+    number id PK
+    number product_id FK
+    number version "UK with product_id"
+    string status "DRAFT ACTIVE ARCHIVED"
+    number total_unit_cost
+  }
+  oc_bom_lines {
+    number id PK
+    number bom_id FK
+    number raw_material_id FK
+    number quantity
+  }
+  oc_sales_orders {
+    number id PK
+    string so_number UK
+    number customer_id FK
+    string status
+    number total_amount
+  }
+  oc_sales_order_lines {
+    number id PK
+    number sales_order_id FK
+    number product_id FK
+    number quantity
+    number unit_price
+  }
+  oc_purchase_orders {
+    number id PK
+    string po_number UK
+    number vendor_id FK
+    number sales_order_id FK "nullable"
+    string status
+  }
+  oc_purchase_order_lines {
+    number id PK
+    number purchase_order_id FK
+    number raw_material_id FK
+    number ordered_quantity
+    number received_quantity
+  }
+  oc_goods_receipt_lines {
+    number id PK
+    number goods_receipt_id FK
+    number po_line_id FK
+    number quantity_received
+  }
+  oc_inventory {
+    number id PK
+    number item_id FK
+    number quantity
+  }
+  oc_stock_movements {
+    number id PK
+    number item_id FK
+    string movement_type
+    number quantity_change
+    number quantity_after
+  }

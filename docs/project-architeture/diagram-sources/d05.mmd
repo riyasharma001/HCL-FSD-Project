@@ -1,0 +1,59 @@
+erDiagram
+  oc_customers |o--o{ oc_invoices : "AR"
+  oc_vendors |o--o{ oc_invoices : "AP"
+  oc_sales_orders |o--o{ oc_invoices : bills
+  oc_purchase_orders |o--o{ oc_invoices : bills
+  oc_invoices ||--|{ oc_invoice_lines : contains
+  oc_invoices ||--o{ oc_credit_notes : reduced_by
+  oc_invoices ||--o{ oc_payment_applications : settled_by
+  oc_payments ||--|{ oc_payment_applications : applied_as
+  oc_customers |o--o{ oc_payments : pays
+  oc_vendors |o--o{ oc_payments : paid
+  oc_approval_workflows ||--|{ oc_approval_workflow_steps : defines
+  oc_approval_workflows ||--o{ oc_approval_requests : used_by
+  oc_approval_requests ||--|{ oc_approval_actions : logs
+  oc_roles |o--o{ oc_approval_workflow_steps : "approver role"
+  oc_users |o--o{ oc_approval_workflow_steps : "approver user"
+  oc_invoices {
+    number id PK
+    string invoice_number UK
+    string invoice_type "AR or AP"
+    string status
+    number total_amount
+    number paid_amount
+    number outstanding
+  }
+  oc_payments {
+    number id PK
+    string payment_number UK
+    string payment_type "INCOMING or OUTGOING"
+    number amount
+    string payment_method
+    number is_reversed
+  }
+  oc_payment_applications {
+    number id PK
+    number payment_id FK
+    number invoice_id FK
+    number applied_amount
+  }
+  oc_approval_workflows {
+    number id PK
+    string document_type
+    number min_amount
+    number max_amount
+  }
+  oc_approval_requests {
+    number id PK
+    string document_type
+    number document_id "polymorphic, no FK"
+    number current_step
+    string status
+  }
+  oc_approval_actions {
+    number id PK
+    number request_id FK
+    number step_order
+    string action
+    number acted_by FK
+  }

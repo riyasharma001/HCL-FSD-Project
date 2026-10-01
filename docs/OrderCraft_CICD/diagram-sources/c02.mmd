@@ -1,0 +1,17 @@
+flowchart LR
+  DEV["Developer"] -->|"git push / PR"| GH["GitHub repository"]
+  GH --> GA["GitHub Actions runners"]
+  GA -->|"push image"| REG[("GHCR container registry")]
+  GA -->|"SSH + deploy.sh"| STG
+  GA -->|"SSH + deploy.sh, after approval"| PRD
+  subgraph STG["Staging server"]
+    SC["Docker Compose: backend container"]
+  end
+  subgraph PRD["Production server"]
+    PC["Docker Compose: backend container"]
+  end
+  REG -->|"docker compose pull"| SC
+  REG -->|"docker compose pull"| PC
+  SC --> SDB[("Oracle - staging")]
+  PC --> PDB[("Oracle - production")]
+  USR["Browser / Angular SPA"] -->|"HTTPS REST"| PC

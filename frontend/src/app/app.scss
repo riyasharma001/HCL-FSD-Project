@@ -1,0 +1,165 @@
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background: #1b4332;
+  color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  .header-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+
+  .brand-badge {
+    width: 38px;
+    height: 38px;
+    background: #d8f3dc;
+    color: #1b4332;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+
+    .brand-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+    }
+
+    .brand-tag {
+      font-size: 0.7rem;
+      color: #95d5b2;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+  }
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #d8f3dc;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    &.active-link {
+      background: #2d6a4f;
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 0.82rem;
+    color: #d8f3dc;
+
+    .user-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .user-name {
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .role-chip {
+      font-size: 0.65rem;
+      font-weight: 700;
+      background: #d8f3dc;
+      color: #1b4332;
+      padding: 1px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  .logout-btn {
+    color: #d8f3dc;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+  }
+}
+
+.main-content {
+  flex: 1;
+
+  &.no-header {
+    height: 100vh;
+  }
+}

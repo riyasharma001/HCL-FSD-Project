@@ -1,0 +1,338 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Master Data Catalog</h1>
+      <p class="page-subtitle">Manage customer directory, finished products, raw inventory, and bill of materials (BOM)</p>
+    </div>
+    <button mat-stroked-button (click)="loadAll()" [disabled]="loading()">
+      <mat-icon>refresh</mat-icon> Refresh
+    </button>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" class="mb-4"></mat-progress-bar>
+  }
+
+  <mat-tab-group animationDuration="200ms" class="content-tabs">
+    <!-- TAB 1: CUSTOMERS -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">groups</mat-icon>
+        Customers ({{ customers().length }})
+      </ng-template>
+
+      <div class="tab-content">
+        <!-- Add Customer Form -->
+        <mat-card class="form-card elevation-z1">
+          <mat-card-header>
+            <mat-icon mat-card-avatar color="primary">person_add</mat-icon>
+            <mat-card-title>Register New Customer</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="pt-4">
+            <form (ngSubmit)="addCustomer()" class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Customer / Company Name</mat-label>
+                <input matInput [(ngModel)]="newCustomer.name" name="cName" required placeholder="e.g. Acme Corp">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Email Address</mat-label>
+                <input matInput type="email" [(ngModel)]="newCustomer.email" name="cEmail" placeholder="purchase@acme.com">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Phone Number</mat-label>
+                <input matInput [(ngModel)]="newCustomer.phone" name="cPhone" placeholder="e.g. +91 9876543210">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Billing / Delivery Address</mat-label>
+                <input matInput [(ngModel)]="newCustomer.address" name="cAddr" placeholder="City, State">
+              </mat-form-field>
+
+              <div class="form-actions">
+                <button mat-flat-button color="primary" type="submit" class="submit-btn">
+                  <mat-icon>add</mat-icon> Add Customer
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Customer List Table -->
+        <mat-card class="table-card elevation-z1">
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Customer Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Address</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (c of customers(); track c.id) {
+                  <tr>
+                    <td><span class="id-badge">#{{ c.id }}</span></td>
+                    <td class="font-medium">{{ c.name }}</td>
+                    <td>{{ c.email || '—' }}</td>
+                    <td>{{ c.phone || '—' }}</td>
+                    <td>{{ c.address || '—' }}</td>
+                    <td>
+                      <button mat-icon-button color="warn" (click)="deleteCustomer(c)" matTooltip="Delete Customer">
+                        <mat-icon>delete_outline</mat-icon>
+                      </button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="6" class="empty-state">No customers registered yet.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- TAB 2: PRODUCTS -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">inventory_2</mat-icon>
+        Finished Goods ({{ products().length }})
+      </ng-template>
+
+      <div class="tab-content">
+        <!-- Add Product Form -->
+        <mat-card class="form-card elevation-z1">
+          <mat-card-header>
+            <mat-icon mat-card-avatar color="primary">post_add</mat-icon>
+            <mat-card-title>Create Finished Product</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="pt-4">
+            <form (ngSubmit)="addProduct()" class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Product Code</mat-label>
+                <input matInput [(ngModel)]="newProduct.code" name="pCode" required placeholder="e.g. PRD-001">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Product Name</mat-label>
+                <input matInput [(ngModel)]="newProduct.name" name="pName" required placeholder="e.g. Steel Chair">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Selling Price (₹)</mat-label>
+                <input matInput type="number" step="0.01" [(ngModel)]="newProduct.price" name="pPrice" required placeholder="0.00">
+              </mat-form-field>
+
+              <div class="form-actions">
+                <button mat-flat-button color="primary" type="submit" class="submit-btn">
+                  <mat-icon>add</mat-icon> Save Product
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Product List Table -->
+        <mat-card class="table-card elevation-z1">
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Product Name</th>
+                  <th>Unit Selling Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of products(); track p.id) {
+                  <tr>
+                    <td><span class="code-badge">{{ p.code }}</span></td>
+                    <td class="font-medium">{{ p.name }}</td>
+                    <td class="font-bold text-success">₹{{ p.price | number:'1.2-2' }}</td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="3" class="empty-state">No products created yet.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- TAB 3: RAW MATERIALS -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">category</mat-icon>
+        Raw Materials ({{ materials().length }})
+      </ng-template>
+
+      <div class="tab-content">
+        <!-- Add Material Form -->
+        <mat-card class="form-card elevation-z1">
+          <mat-card-header>
+            <mat-icon mat-card-avatar color="primary">add_box</mat-icon>
+            <mat-card-title>Define Raw Material</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="pt-4">
+            <form (ngSubmit)="addMaterial()" class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Material Code</mat-label>
+                <input matInput [(ngModel)]="newMaterial.code" name="mCode" required placeholder="e.g. MAT-001">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Material Name</mat-label>
+                <input matInput [(ngModel)]="newMaterial.name" name="mName" required placeholder="e.g. Steel Rod">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Standard Unit Cost (₹)</mat-label>
+                <input matInput type="number" step="0.01" [(ngModel)]="newMaterial.unitCost" name="mCost" required placeholder="0.00">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Initial In-Hand Stock</mat-label>
+                <input matInput type="number" [(ngModel)]="newMaterial.stock" name="mStock" placeholder="0">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Primary Supplier / Vendor</mat-label>
+                <input matInput [(ngModel)]="newMaterial.supplier" name="mSupp" placeholder="Supplier Company">
+              </mat-form-field>
+
+              <div class="form-actions">
+                <button mat-flat-button color="primary" type="submit" class="submit-btn">
+                  <mat-icon>add</mat-icon> Add Raw Material
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Material List Table -->
+        <mat-card class="table-card elevation-z1">
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Material Name</th>
+                  <th>Unit Cost</th>
+                  <th>Current Stock</th>
+                  <th>Supplier</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (m of materials(); track m.id) {
+                  <tr>
+                    <td><span class="code-badge">{{ m.code }}</span></td>
+                    <td class="font-medium">{{ m.name }}</td>
+                    <td>₹{{ m.unitCost | number:'1.2-2' }}</td>
+                    <td>
+                      <span [class.stock-low]="m.stock < 20" [class.stock-ok]="m.stock >= 20" class="stock-pill">
+                        {{ m.stock }} units
+                      </span>
+                    </td>
+                    <td>{{ m.supplier || '—' }}</td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="5" class="empty-state">No raw materials defined yet.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- TAB 4: BILL OF MATERIALS (BOM) -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">account_tree</mat-icon>
+        Bill of Materials (BOM) ({{ boms().length }})
+      </ng-template>
+
+      <div class="tab-content">
+        <!-- Add BOM Form -->
+        <mat-card class="form-card elevation-z1">
+          <mat-card-header>
+            <mat-icon mat-card-avatar color="primary">hub</mat-icon>
+            <mat-card-title>Assign Raw Material to Finished Product</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="pt-4">
+            <form (ngSubmit)="addBom()" class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Select Finished Product</mat-label>
+                <mat-select [(ngModel)]="newBom.productId" name="bomProd" required>
+                  @for (p of products(); track p.id) {
+                    <mat-option [value]="p.id">{{ p.code }} — {{ p.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Required Raw Material</mat-label>
+                <mat-select [(ngModel)]="newBom.materialId" name="bomMat" required>
+                  @for (m of materials(); track m.id) {
+                    <mat-option [value]="m.id">{{ m.code }} — {{ m.name }} (Stock: {{ m.stock }})</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Quantity Per Finished Unit</mat-label>
+                <input matInput type="number" min="1" [(ngModel)]="newBom.qtyPerUnit" name="bomQty" required>
+              </mat-form-field>
+
+              <div class="form-actions">
+                <button mat-flat-button color="primary" type="submit" class="submit-btn">
+                  <mat-icon>link</mat-icon> Map to BOM
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- BOM List Table -->
+        <mat-card class="table-card elevation-z1">
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Finished Product</th>
+                  <th>Component Raw Material</th>
+                  <th>Quantity / Unit</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (b of boms(); track b.id) {
+                  <tr>
+                    <td class="font-medium">{{ b.product.name }} ({{ b.product.code }})</td>
+                    <td>{{ b.material.name }} ({{ b.material.code }})</td>
+                    <td><span class="badge-status badge-shipped">{{ b.qtyPerUnit }} per unit</span></td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="3" class="empty-state">No BOM relationships defined yet.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

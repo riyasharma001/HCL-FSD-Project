@@ -1,0 +1,6 @@
+stateDiagram-v2
+  [*] --> DRAFT : create
+  DRAFT --> ACTIVE : activate
+  ACTIVE --> ARCHIVED : superseded by new version
+  ACTIVE --> ACTIVE : edit creates version n+1 (old one archived)
+  ARCHIVED --> [*]

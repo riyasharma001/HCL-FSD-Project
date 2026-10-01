@@ -1,0 +1,10 @@
+sequenceDiagram
+  actor F as Finance user
+  participant PS as PaymentService
+  participant IS as InvoiceService
+  F->>PS: POST /payments (amount, method, reference, invoices)
+  PS->>PS: insert oc_payments + oc_payment_applications
+  PS->>IS: paid_amount += applied, outstanding = total - paid
+  IS->>IS: outstanding = 0 ? PAID : PARTIALLY_PAID
+  F->>PS: POST /payments/{id}/reverse (reason)
+  PS->>IS: restore outstanding, recompute status

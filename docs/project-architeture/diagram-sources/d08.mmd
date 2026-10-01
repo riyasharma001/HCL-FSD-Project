@@ -1,0 +1,17 @@
+stateDiagram-v2
+  [*] --> DRAFT
+  DRAFT --> PENDING_APPROVAL : submit
+  PENDING_APPROVAL --> APPROVED : approve
+  PENDING_APPROVAL --> REJECTED : reject
+  REJECTED --> DRAFT : revise ⚠
+  APPROVED --> ORDERED : send to vendor
+  ORDERED --> PARTIALLY_RECEIVED : partial receipt
+  ORDERED --> RECEIVED : full receipt
+  PARTIALLY_RECEIVED --> PARTIALLY_RECEIVED : further partial receipt
+  PARTIALLY_RECEIVED --> RECEIVED : remaining received
+  DRAFT --> CANCELLED : cancel
+  APPROVED --> CANCELLED : cancel
+  ORDERED --> CANCELLED : cancel
+  PARTIALLY_RECEIVED --> CANCELLED : cancel, received stock stays
+  RECEIVED --> [*]
+  CANCELLED --> [*]

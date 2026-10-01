@@ -1,0 +1,82 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+:root {
+  --primary-dark: #1b4332;
+  --primary-medium: #2d6a4f;
+  --primary-light: #40916c;
+  --primary-mint: #d8f3dc;
+  --accent: #52b788;
+  --surface-bg: #f8fafc;
+  --card-bg: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border-color: #e2e8f0;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Roboto', "Helvetica Neue", sans-serif;
+  background-color: var(--surface-bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Status Badges */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.badge-new { background-color: #e0f2fe; color: #0369a1; }
+.badge-confirmed { background-color: #fef3c7; color: #b45309; }
+.badge-shipped { background-color: #e0e7ff; color: #4338ca; }
+.badge-completed { background-color: #dcfce7; color: #15803d; }
+.badge-cancelled { background-color: #fee2e2; color: #b91c1c; }
+.badge-paid { background-color: #dcfce7; color: #15803d; }
+.badge-unpaid { background-color: #fee2e2; color: #b91c1c; }
+.badge-partial { background-color: #fef3c7; color: #b45309; }
+.badge-ordered { background-color: #e0f2fe; color: #0369a1; }
+.badge-received { background-color: #dcfce7; color: #15803d; }
+
+/* Global table overrides */
+.mat-mdc-table {
+  background: transparent !important;
+}
+
+.mat-mdc-header-cell {
+  color: var(--text-secondary) !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mat-mdc-cell {
+  color: var(--text-primary) !important;
+  font-size: 0.88rem !important;
+}

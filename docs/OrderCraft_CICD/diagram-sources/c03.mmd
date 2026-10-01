@@ -1,0 +1,18 @@
+sequenceDiagram
+  participant GA as GitHub Actions
+  participant REG as GHCR
+  participant SRV as Server
+  participant DB as Oracle
+  GA->>REG: push image tag sha-abc1234
+  GA->>SRV: ssh, run deploy.sh with tag
+  SRV->>SRV: remember OLD_TAG from .env, set IMAGE_TAG to new tag
+  SRV->>REG: docker compose pull backend
+  SRV->>SRV: docker compose up -d backend
+  SRV->>DB: Flyway applies pending migrations on startup
+  SRV->>SRV: poll /v3/api-docs up to 90 s
+  alt healthy
+    SRV-->>GA: exit 0, deploy OK
+  else unhealthy
+    SRV->>SRV: restore OLD_TAG and restart backend
+    SRV-->>GA: exit 1, pipeline fails
+  end

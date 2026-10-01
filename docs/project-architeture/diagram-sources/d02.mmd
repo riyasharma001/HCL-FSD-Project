@@ -1,0 +1,21 @@
+flowchart LR
+  AUTH["1 Auth"] --- USR["2 Users and Roles"]
+  CUS["3 Customers"] --> SO["7 Sales Orders"]
+  PRD["5 Items"] --> BOM["6 BOM"]
+  PRD --> SO
+  BOM -->|"explosion"| SO
+  SO -->|"shortfall"| PO["8 Purchase Orders"]
+  VEN["4 Vendors"] --> PO
+  PO -->|"goods receipt"| INV["9 Inventory"]
+  INV -->|"availability check"| SO
+  SO -->|"completed"| IVC["10 Invoicing"]
+  PO -->|"received"| IVC
+  IVC --> PAY["11 Payments"]
+  APR["12 Approval Engine"] -.governs.- SO
+  APR -.governs.- PO
+  APR -.governs.- IVC
+  SO --> DSH["13 Dashboard and Reports"]
+  PAY --> DSH
+  CFG["15 System Config"] -.-> SO
+  CFG -.-> IVC
+  AUD["14 Audit (created/updated by/at)"] -.-> PRD

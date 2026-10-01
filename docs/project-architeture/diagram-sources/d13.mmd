@@ -1,0 +1,19 @@
+sequenceDiagram
+  actor S as Sales user
+  actor A as Approver
+  participant SO as SalesOrderService
+  participant AP as ApprovalEngine
+  participant BM as BomService
+  participant IV as InventoryService
+  participant PO as PurchaseOrderService
+  S->>SO: POST /sales-orders/{id}/submit
+  SO->>AP: create request (type, amount)
+  AP-->>A: appears in pending queue
+  A->>AP: POST /approvals/{id}/approve
+  AP->>SO: status = APPROVED
+  SO->>BM: explode active BOMs x quantities
+  BM-->>SO: material requirements
+  SO->>IV: check availability
+  IV-->>SO: shortfall list
+  S->>SO: POST /sales-orders/{id}/generate-po
+  SO->>PO: create DRAFT POs grouped by vendor
