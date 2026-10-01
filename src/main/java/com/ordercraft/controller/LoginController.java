@@ -1,5 +1,6 @@
 package com.ordercraft.controller;
 
+<<<<<<< HEAD
 import com.ordercraft.config.JwtService;
 import com.ordercraft.model.User;
 import com.ordercraft.repository.UserRepository;
@@ -10,10 +11,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+=======
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+>>>>>>> 74ea1c64538c61d40779212c657caf7dd6277212
 @RestController
 @RequestMapping("/api")
 public class LoginController {
 
+<<<<<<< HEAD
     private final UserRepository userRepository;
     private final JwtService jwtService;
 
@@ -55,11 +64,24 @@ public class LoginController {
             resp.put("fullName", "System Administrator");
             resp.put("message", "Login successful");
             return ResponseEntity.ok(resp);
+=======
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> login) {
+
+        String username = login.get("username");
+        String password = login.get("password");
+
+        if ("admin".equals(username) && "admin123".equals(password)) {
+            return ResponseEntity.ok(
+                Map.of("message", "Login successful")
+            );
+>>>>>>> 74ea1c64538c61d40779212c657caf7dd6277212
         }
 
         return ResponseEntity.status(401)
                 .body(Map.of("error", "Invalid username or password"));
     }
+<<<<<<< HEAD
 
     @GetMapping("/auth/me")
     public ResponseEntity<?> me(@RequestAttribute(value = "username", required = false) String username,
@@ -69,4 +91,6 @@ public class LoginController {
         }
         return ResponseEntity.ok(Map.of("username", username, "role", role != null ? role : "USER"));
     }
+=======
+>>>>>>> 74ea1c64538c61d40779212c657caf7dd6277212
 }

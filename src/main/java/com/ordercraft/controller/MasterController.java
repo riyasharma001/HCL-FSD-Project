@@ -43,6 +43,7 @@ public class MasterController {
         return customers.save(c);
     }
 
+<<<<<<< HEAD
     @DeleteMapping("/customers/{id}")
     public void deleteCustomer(@PathVariable Long id) {
         if (!customers.existsById(id)) {
@@ -55,6 +56,8 @@ public class MasterController {
         }
     }
 
+=======
+>>>>>>> 74ea1c64538c61d40779212c657caf7dd6277212
     @GetMapping("/products")
     public List<Product> products() { return products.findAll(); }
 

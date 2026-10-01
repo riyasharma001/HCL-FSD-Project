@@ -43,16 +43,6 @@
             <version>8.0.33</version>
             <scope>runtime</scope>
         </dependency>
-<<<<<<< HEAD
-
-        <!-- H2 In-Memory / File Database -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-=======
->>>>>>> 74ea1c64538c61d40779212c657caf7dd6277212
         <!-- Validation -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

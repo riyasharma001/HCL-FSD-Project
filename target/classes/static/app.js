@@ -53,11 +53,7 @@ async function refreshAll() {
 async function loadMasters() {
   const [c, p, m, b] = await Promise.all([
     api("/customers"), api("/products"), api("/materials"), api("/bom")]);
-<<<<<<< HEAD
-  $("custBody").innerHTML = rows(c, x => td(x.id, x.name, x.email, x.phone, x.address, `<button onclick="delCustomer(${x.id})">Delete</button>`));
-=======
   $("custBody").innerHTML = rows(c, x => td(x.id, x.name, x.email, x.phone, x.address));
->>>>>>> 74ea1c64538c61d40779212c657caf7dd6277212
   $("prodBody").innerHTML = rows(p, x => td(x.code, x.name, x.price));
   $("matBody").innerHTML = rows(m, x => td(x.code, x.name, x.unitCost, x.stock, x.supplier));
   $("bomBody").innerHTML = rows(b, x => td(x.product.name, x.material.name, x.qtyPerUnit));
@@ -80,17 +76,6 @@ function addCustomer() {
   }, "Customer added");
 }
 
-<<<<<<< HEAD
-function delCustomer(id) {
-  if (!confirm("Are you sure you want to delete this customer?")) return;
-  run(async () => {
-    await api(`/customers/${id}`, "DELETE");
-    await loadMasters();
-  }, "Customer deleted");
-}
-
-=======
->>>>>>> 74ea1c64538c61d40779212c657caf7dd6277212
 function addProduct() {
   run(async () => {
     await api("/products", "POST", {
